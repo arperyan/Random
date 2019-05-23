@@ -1,0 +1,69 @@
+body {
+  margin-top: 20px;
+  font-family: arial;
+}
+
+.left,
+.right {
+  display: inline-block;
+  float: left;
+
+}
+
+.left {
+  width: 300px;
+  padding: 20px;
+}
+
+.right {
+  width: calc(100% - 400px);
+  padding: 20px;
+}
+
+.scriptSelect {
+  cursor: pointer;
+}
+
+textarea {
+  padding: 20px;
+  border: none;
+  background-color: #e2e2e2;
+  width: 98%;
+  height: 750px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.appList {
+  margin-bottom: 10px;
+}
+
+p {
+  color: #888888;
+  margin-top: 5px;
+}
+
+input {
+  height: 30px;
+  width: 200px;
+}
+
+button {
+  height: 36px;
+}
+
+h3 {
+  margin-block-start: 0.5em;
+}
+
+.lui-button {
+  margin: 10px 5px 0 0;
+}
+
+.lui-select--large {
+  margin: 20px 0;
+}
