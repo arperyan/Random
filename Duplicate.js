@@ -28,6 +28,27 @@ fetch("./node_modules/enigma.js/schemas/12.67.2.json").then(response => {
 
   })
 
+  var body = document.getElementsByTagName('body')[0];
+  var removeLoading = function () {
+    // In a production application you would remove the loading class when your
+    // application is initialized and ready to go.  Here we just artificially wait
+    // 3 seconds before removing the class.
+    setTimeout(function () {
+      body.className = body.className.replace(/loading/, '');
+    }, 4000);
+  };
+
+  removeLoading();
+
+
+  ///------Text editor
+  var myCodeMirror = CodeMirror.fromTextArea(document.getElementById('script'), {
+    mode: "simplemode",
+    lineNumbers: true,
+    collapsed: true,
+    lineWrapping: true,
+  });
+
 
   ///// ---------------------------- Load the list of Apps
   async function loadDocList() {
@@ -47,25 +68,6 @@ fetch("./node_modules/enigma.js/schemas/12.67.2.json").then(response => {
   }
 
 
-  ///----------------------------- Relaod the App
-  let appReload = document.getElementById('reload')
-  if (appReload) {
-    appReload.addEventListener('click', () => {
-      if (currApp) {
-        const script = document.getElementById('script').value;
-        (async function () {
-          await currApp.setScript(script)
-          let result = await currApp.doReload()
-          await currApp.doSave()
-          if (result === true) {
-            document.getElementById('progress').innerText = 'COMPLETE'
-          }
-        })()
-
-      }
-    })
-  }
-
   ///---------------Global Variables need to be used in other selections - it was casuing a issue
   let appName, appId
 
@@ -75,12 +77,21 @@ fetch("./node_modules/enigma.js/schemas/12.67.2.json").then(response => {
     appSelect.addEventListener('click', (e) => {
       appId = e.target.attributes["data-value"].value
       appName = e.target.attributes["data-name"].value
+
+      ////-----------------New App selected the message should dissappear
+      document.getElementById('progress').innerText = ''
+
       ///--------------Connect to the app selected
       connect(appId)
 
+      /////-------------Loading while script is selected
+      body.classList.add("loading")
+      removeLoading();
+
       ////---------------- Message sent to the publish box
       document.getElementById('streamName').innerHTML = `<span>Publish App <strong> ${appName} </strong></span>`
-      test = false
+      ////Editor title
+      document.getElementById('headerScript').innerText = `Script Editor - ${appName}`
     })
 
   }
@@ -92,6 +103,7 @@ fetch("./node_modules/enigma.js/schemas/12.67.2.json").then(response => {
       if (currApp) {
         (async function () {
           let result = await qlik.createApp(`${appName}(New)`)
+          body.classList.add("loading")
           copyApp(result.qAppId, appId)
         })()
       }
@@ -99,15 +111,15 @@ fetch("./node_modules/enigma.js/schemas/12.67.2.json").then(response => {
 
   }
 
-  
+
   ////------------------ Copy the app after an app has been created
   async function copyApp(newAppId, appId) {
     let result = await qlik.copyApp(newAppId, appId, [])
     if (result === true) {
-      document.getElementById('progress').innerText = 'COPIED'
-
+      document.getElementById('progress').innerText = 'COPY COMPLETE'
     }
     loadDocList()
+    removeLoading();
   }
 
 
@@ -132,16 +144,43 @@ fetch("./node_modules/enigma.js/schemas/12.67.2.json").then(response => {
 
     let app = await global.openDoc(appId)
     currApp = app
-    getScript()
 
+    getScript()
+  }
+
+  ///----------------------------- Reload the App
+  let appReload = document.getElementById('reload')
+  if (appReload) {
+    appReload.addEventListener('click', () => {
+      if (currApp) {
+        ///Loading of App
+        body.classList.add("loading")
+        const script = document.getElementById("script").value
+        console.log(script);
+
+        (async function () {
+          await currApp.setScript(script)
+          let result = await currApp.doReload()
+          console.log(result)
+          await currApp.doSave()
+          if (result === true) {
+            document.getElementById('progress').innerText = 'RELOAD COMPLETE'
+            removeLoading();
+          }
+        })()
+        
+      }
+    })
   }
 
   ///---- Get the script
   async function getScript() {
     let script = await currApp.getScript()
+    ////------NB - This helps setScript in the reload
     document.getElementById("script").value = script
+    ////-----------This inserts the script into codemirror
+    insertText(script)
     console.log(currApp)
-
   }
 
   ///------------------------Load the list of Streams
@@ -161,10 +200,10 @@ fetch("./node_modules/enigma.js/schemas/12.67.2.json").then(response => {
         ///----------------- Create the list of Streams
         let html = '<option>-- Select --</option>'
         data.forEach((d, i) => {
-          if (d.name.indexOf('Monitoring') >= 0) {
+          // if (d.name.indexOf('Monitoring') >= 0) {
           html +=
             `<option value="${d.id}">${d.name}</option>`
-          }
+          // }
         })
         var e = document.querySelector(".streamList");
         e.innerHTML = html
@@ -213,6 +252,7 @@ fetch("./node_modules/enigma.js/schemas/12.67.2.json").then(response => {
                   } finally {
                     if (!this.err) {
                       dialog.close();
+                      document.getElementById('progress').innerText = 'PUBLISH COMPLETE'
                     }
                   }
                 })();
@@ -222,6 +262,24 @@ fetch("./node_modules/enigma.js/schemas/12.67.2.json").then(response => {
         }
       });
     });
+  }
+
+  function insertText(data) {
+    var cm = $(".CodeMirror")[0].CodeMirror;
+    var doc = cm.getDoc();
+    //var cursor = doc.getCursor();  // gets the line number in the cursor position
+    var line = doc.getLine(0); // get the line contents
+    var pos = {
+      line: 0
+    };
+    if (line.length === 0) {
+      // check if the line is empty
+      // add the data
+      doc.replaceRange(data, pos);
+    } else {
+      // add a new line and the data
+      doc.replaceRange("\n" + data, pos);
+    }
   }
 
 })
