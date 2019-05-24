@@ -3,24 +3,29 @@
 
 <head>
   <link rel="stylesheet" href="./node_modules/leonardo-ui/dist/leonardo-ui.css" type="text/css" />
+  <link rel="stylesheet" href="./node_modules/codemirror/lib/codemirror.css">
   <link rel="stylesheet" href="./public/css/styles.css">
+  <script src="./node_modules/codemirror/lib/codemirror.js"></script>
 </head>
 
-<body>
+<body class="loading">
   <div class="left">
     <ul id='appList'></ul>
   </div>
   <div class="right">
+    <h1 id="headerScript">Script Editor</h1>
     <textarea id="script"></textarea>
-    <button class="lui-button" id="reload">Reload</button>
     <button class="lui-button" id="copy">Copy App</button>
+    <button class="lui-button" id="reload">Reload App</button>
     <span id="progress"></span>
     <div id="info"></div>
-    <button class="lui-button  dialog-trigger">Stream</button>
+    <button class="lui-button  dialog-trigger">Publish App</button>
+    <!-- <span id="progressStream"></span> -->
     <div class="dialog-content" style="display: none;">
       <div class="lui-dialog" style="width: 400px;">
         <div class="lui-dialog__header">
           <div class="lui-dialog__title">Streams</div>
+
         </div>
         <div class="lui-dialog__body">
           <select class="streamList lui-select  lui-select--large">
