@@ -29,7 +29,7 @@ textarea {
   border: none;
   background-color: #e2e2e2;
   width: 98%;
-  height: 750px;
+  /* height: 750px; */
 }
 
 ul {
@@ -66,4 +66,28 @@ h3 {
 
 .lui-select--large {
   margin: 20px 0;
+}
+
+.CodeMirror {
+  border: 1px solid #eee;
+  height: 700px;
+}
+
+body {
+  -webkit-transition: background-color 1s;
+  transition: background-color 1s;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body.loading {
+  background: #fff url('https://code.jquery.com/mobile/1.3.1/images/ajax-loader.gif') no-repeat 50% 50%;
+  -webkit-transition: background-color 0.1;
+  transition: background-color 0.1;
+  opacity: 0.1;
+  -webkit-transition: opacity 0.1;
+  transition: opacity 0.1;
 }
